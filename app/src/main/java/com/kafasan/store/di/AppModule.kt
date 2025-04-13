@@ -11,6 +11,8 @@ import com.kafasan.store.domain.network.ApiUrl
 import com.kafasan.store.domain.network.StoreRepository
 import com.kafasan.store.domain.network.StoreRepositoryImpl
 import com.kafasan.store.domain.network.StoreService
+import com.kafasan.store.domain.network.TimerUtility
+import com.kafasan.store.domain.network.TimerUtilityImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -80,5 +82,11 @@ object AppModule {
     @Singleton
     fun provideProductRepository(dao: ProductDao): ProductRepository {
         return ProductRepositoryImpl(dao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTimerUtility(): TimerUtility {
+        return TimerUtilityImpl()
     }
 }

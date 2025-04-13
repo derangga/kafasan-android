@@ -11,3 +11,5 @@ val LightPrimary = Color(0xFF2A4BA0)
 val LightSecondary = Color(0xFF153075)
 val LightTertiary = Color(0xFFF9B023)
 val Yellow400 = Color(0xFFFFC83A)
+
+val redFavorite = Color(0xFFF44336)

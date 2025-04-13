@@ -28,22 +28,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.kafasan.store.ui.Route
 import com.kafasan.store.ui.components.SearchBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SuggestSearchScreen(navController: NavHostController, viewModel: SearchProductViewModel) {
-
+fun SuggestSearchScreen(navController: NavHostController, viewModel: SuggestSearchViewModel) {
+    val uiState = viewModel.products.collectAsStateWithLifecycle()
     val focusRequester = remember { FocusRequester() }
-    val state = viewModel.products.collectAsStateWithLifecycle()
 
     // Request focus when entering the screen
     LaunchedEffect("SearchProduct") {
-        focusRequester.requestFocus()
+        try {
+            focusRequester.requestFocus()
+        } catch (_: Exception) {}
     }
 
     Scaffold(
@@ -54,10 +57,11 @@ fun SuggestSearchScreen(navController: NavHostController, viewModel: SearchProdu
                 title = {
                     SearchBar(
                         hint = "samsung j-prime",
-                        modifier = Modifier.focusRequester(focusRequester),
+                        modifier = Modifier.focusRequester(focusRequester)
+                            .testTag("searchBar"),
                         onSearchClicked = {
                             if (it.isNotEmpty()) {
-                                navController.navigate("search/${it}")
+                                navController.navigate(Route.search(it))
                             }
                         },
                         onTextChange = {
@@ -83,13 +87,14 @@ fun SuggestSearchScreen(navController: NavHostController, viewModel: SearchProdu
         LazyColumn(
             modifier = Modifier.padding(ip)
         ) {
-            items(state.value) { product ->
+            items(uiState.value) { product ->
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
                         .clickable {
-                            navController.navigate("product/${product.id}")
+                            navController.navigate(Route.productDetail(product.id))
                         }
                 ) {
                     Icon(

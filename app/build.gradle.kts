@@ -42,6 +42,12 @@ android {
         compose = true
         buildConfig = true
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -82,10 +88,20 @@ dependencies {
     implementation(libs.coroutines)
 
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.dagger.hilt.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.jetpack.navigation.test)
+    kspTest(libs.dagger.compiler)
+
+    androidTestImplementation(libs.dagger.hilt.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.mockk)
+    kspAndroidTest(libs.dagger.compiler)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
