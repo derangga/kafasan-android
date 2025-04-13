@@ -32,14 +32,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.kafasan.store.domain.network.ApiLoad
+import com.kafasan.store.ui.Route
 import com.kafasan.store.ui.components.CenterCircularLoading
 import com.kafasan.store.ui.components.ProductItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(navController: NavController, query: String, viewModel: SearchViewModel) {
-    val state = viewModel.products.collectAsStateWithLifecycle()
-
+    val uiState = viewModel.products.collectAsStateWithLifecycle()
     LaunchedEffect("SearchScreen") {
         viewModel.searchProduct(query)
     }
@@ -73,7 +73,7 @@ fun SearchScreen(navController: NavController, query: String, viewModel: SearchV
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            when (val result = state.value) {
+            when (val apiLoad = uiState.value) {
                 is ApiLoad.Error -> {}
                 ApiLoad.Loading -> {
                     item {
@@ -87,7 +87,7 @@ fun SearchScreen(navController: NavController, query: String, viewModel: SearchV
                 }
 
                 is ApiLoad.Success -> {
-                    val products = result.data
+                    val products = apiLoad.data
                     if (products.isEmpty()) {
                         item {
                             Box(
@@ -119,9 +119,13 @@ fun SearchScreen(navController: NavController, query: String, viewModel: SearchV
                                             modifier = Modifier
                                                 .weight(1f)
                                                 .height(220.dp),
-                                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                            elevation = CardDefaults.cardElevation(
+                                                defaultElevation = 2.dp
+                                            ),
                                             onClick = {
-                                                navController.navigate("product/${product.id}")
+                                                navController.navigate(
+                                                    Route.productDetail(product.id)
+                                                )
                                             }
                                         ) {
                                             ProductItem(product)

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kafasan.store.data.Product
 import com.kafasan.store.domain.network.Result
 import com.kafasan.store.domain.network.StoreRepository
+import com.kafasan.store.domain.network.TimerUtility
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
-class SearchProductViewModel @Inject constructor(
+class SuggestSearchViewModel @Inject constructor(
+    private val timerUtility: TimerUtility,
     private val storeRepo: StoreRepository
 ): ViewModel() {
     private val _products = MutableStateFlow<List<Product>>(emptyList())
@@ -28,7 +30,7 @@ class SearchProductViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _query
-                .debounce(500) // 300ms delay
+                .debounce(timerUtility.debounceTime())
                 .distinctUntilChanged()
                 .collectLatest { query ->
                     if (query.isNotBlank()) {

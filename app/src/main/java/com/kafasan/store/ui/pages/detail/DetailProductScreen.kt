@@ -30,7 +30,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -39,23 +41,24 @@ import com.kafasan.store.data.Product
 import com.kafasan.store.domain.network.ApiLoad
 import com.kafasan.store.ui.components.CenterCircularLoading
 import com.kafasan.store.ui.components.ImageCarousel
+import com.kafasan.store.ui.theme.redFavorite
 
 @Composable
 fun DetailProductScreen(
     navController: NavHostController,
     id: Int,
-    viewmodel: DetailProductViewModel
+    viewModel: DetailProductViewModel
 ) {
-    val state = viewmodel.product.collectAsStateWithLifecycle().value
+    val uiState = viewModel.product.collectAsStateWithLifecycle()
 
     LaunchedEffect(id) {
-        viewmodel.getProductById(id)
+        viewModel.getProductById(id, false)
     }
 
-    when (val apiLoad = state.product) {
+    when (val apiLoad = uiState.value.product) {
         is ApiLoad.Error -> {
             DetailProductError(navController) {
-                viewmodel.getProductById(id, true)
+                viewModel.getProductById(id, true)
             }
         }
 
@@ -65,8 +68,8 @@ fun DetailProductScreen(
 
         is ApiLoad.Success -> {
             val product = apiLoad.data
-            DetailProduct(navController, product, state.isFavorite) {
-                viewmodel.favoriteProduct(product)
+            DetailProduct(navController, product, uiState.value.isFavorite) {
+                viewModel.favoriteProduct(product)
             }
         }
     }
@@ -97,7 +100,9 @@ private fun DetailProductLoading(navController: NavHostController) {
 
 @Composable
 private fun DetailProductError(navController: NavHostController, retry: () -> Unit) {
-    Column {
+    Column(
+        modifier = Modifier.testTag("errorSection")
+    ) {
         IconButton(
             onClick = {
                 navController.popBackStack()
@@ -117,7 +122,10 @@ private fun DetailProductError(navController: NavHostController, retry: () -> Un
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(horizontal = 12.dp)
             ) {
-                Text("Something wrong with your request, please try again")
+                Text(
+                    "Something wrong with your request, please try again",
+                    textAlign = TextAlign.Center
+                )
                 Button(
                     onClick = retry
                 ) {
@@ -142,7 +150,7 @@ private fun DetailProduct(
             .verticalScroll(scrollState)
     ) {
         Box {
-            ImageCarousel(product.images)
+            ImageCarousel(product.images, modifier = Modifier.testTag("imageCarousel"))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -165,17 +173,14 @@ private fun DetailProduct(
                     val icon = if (isFavorite) {
                         Icons.Default.Favorite
                     } else Icons.Default.FavoriteBorder
-                    val color = if (isFavorite) {
-                        Color(0xFFF44336)
-                    } else Color.White
+                    val color = if (isFavorite) redFavorite else Color.White
+                    val description = if (isFavorite) "Favorite" else "Favorite Border"
                     Icon(
                         imageVector = icon,
-                        contentDescription = "Favorite",
+                        contentDescription = description,
                         tint = color
                     )
                 }
-
-
             }
         }
         Box(
@@ -196,18 +201,23 @@ private fun DetailProduct(
                     product.title,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.testTag("title")
                 )
                 Text(
                     "$${product.price}",
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 12.dp)
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .testTag("price")
                 )
                 Text("Details", modifier = Modifier.padding(top = 32.dp), fontSize = 18.sp)
                 Text(
                     product.description,
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .testTag("description"),
                     color = Color(0xFF8891A5)
                 )
                 Row(
@@ -217,7 +227,8 @@ private fun DetailProduct(
                     val context = LocalContext.current
                     OutlinedButton(
                         onClick = {
-                            Toast.makeText(context, "", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "ATC ${product.title}", Toast.LENGTH_SHORT)
+                                .show()
                         },
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
@@ -228,7 +239,7 @@ private fun DetailProduct(
                     }
                     Button(
                         onClick = {
-                            Toast.makeText(context, "", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, product.title, Toast.LENGTH_SHORT).show()
                         },
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.weight(1f)

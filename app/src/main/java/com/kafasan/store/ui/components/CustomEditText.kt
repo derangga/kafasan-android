@@ -54,8 +54,7 @@ fun SearchBar(
         modifier = Modifier
             .height(height)
             .fillMaxWidth()
-            .background(color = backgroundColor, shape = cornerShape)
-            .clickable { onSearchClicked(text.text) },
+            .background(color = backgroundColor, shape = cornerShape),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BasicTextField(
@@ -95,7 +94,7 @@ fun SearchBar(
             singleLine = true
         )
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .weight(1f)
                 .size(40.dp)
                 .background(color = Color.Transparent, shape = CircleShape)
@@ -109,7 +108,7 @@ fun SearchBar(
             if (text.text.isNotEmpty()) {
                 Icon(
                     Icons.Default.Close,
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxSize()
                         .padding(8.dp),
                     contentDescription = "clear",
@@ -118,7 +117,7 @@ fun SearchBar(
             } else {
                 Icon(
                     Icons.Default.Search,
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxSize()
                         .padding(8.dp),
                     contentDescription = "search",

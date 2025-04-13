@@ -31,12 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.kafasan.store.ui.Route
 import com.kafasan.store.ui.components.ProductItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteScreen(navController: NavHostController, viewModel: FavoriteViewModel) {
-    val products = viewModel.products.collectAsStateWithLifecycle().value
+    val uiState = viewModel.products.collectAsStateWithLifecycle()
 
     LaunchedEffect("FavoriteScreen") {
         viewModel.getFavoriteProducts()
@@ -67,6 +68,7 @@ fun FavoriteScreen(navController: NavHostController, viewModel: FavoriteViewMode
             modifier = Modifier
                 .padding(ip)
         ) {
+            val products = uiState.value
             item {
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -74,7 +76,9 @@ fun FavoriteScreen(navController: NavHostController, viewModel: FavoriteViewMode
             if (products.isEmpty()) {
                 item {
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -102,7 +106,7 @@ fun FavoriteScreen(navController: NavHostController, viewModel: FavoriteViewMode
                                         .height(220.dp),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                                     onClick = {
-                                        navController.navigate("product/${product.id}")
+                                        navController.navigate(Route.productDetail(product.id))
                                     }
                                 ) {
                                     ProductItem(product)

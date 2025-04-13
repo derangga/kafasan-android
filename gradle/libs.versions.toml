@@ -4,6 +4,8 @@ kotlin = "2.0.21"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
+robolectricVersion = "4.14"
+mockkVersion = "1.14.0"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.0"
@@ -50,6 +52,7 @@ room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 jetpack-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "jetpackNavigation" }
 jetpack-navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "jetpackNavigation" }
 jetpack-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "jetpackNavigation" }
+jetpack-navigation-test = { group = "androidx.navigation", name = "navigation-testing", version.ref = "jetpackNavigation" }
 
 jetpack-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "jetpackPaging" }
 jetpack-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "jetpackPaging" }
@@ -61,11 +64,15 @@ coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core"
 dagger-hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "daggerHilt" }
 dagger-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "daggerHilt" }
 dagger-hilt-nav-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "daggerHiltNavCompose" }
+dagger-hilt-test = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "daggerHilt" }
 
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-gsonConverter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockkVersion"}
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectricVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

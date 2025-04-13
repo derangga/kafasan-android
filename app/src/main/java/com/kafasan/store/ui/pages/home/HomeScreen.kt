@@ -7,8 +7,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.kafasan.store.ui.Route
 import com.kafasan.store.ui.components.CenterCircularLoading
 import com.kafasan.store.ui.components.ProductItem
 
@@ -56,7 +55,6 @@ import com.kafasan.store.ui.components.ProductItem
 fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
     val pagingItems = viewModel.getProducts().collectAsLazyPagingItems()
     val listState = rememberLazyListState()
-
     val collapsed by remember {
         derivedStateOf {
             val firstVisibleItem = listState.firstVisibleItemIndex
@@ -79,10 +77,10 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                 height = animatedHeight,
                 collapsed = collapsed,
                 onFavoriteClick = {
-                    navController.navigate("favorite")
+                    navController.navigate(Route.FAVORITE)
                 },
                 onSearchClick = {
-                    navController.navigate("suggest-search")
+                    navController.navigate(Route.SUGGEST_SEARCH)
                 }
             )
         }
@@ -109,7 +107,7 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                                     .height(220.dp),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                                 onClick = {
-                                    navController.navigate("product/${product.id}")
+                                    navController.navigate(Route.productDetail(product.id))
                                 }
                             ) {
                                 ProductItem(prd)
