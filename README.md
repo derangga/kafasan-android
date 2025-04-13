@@ -18,3 +18,8 @@ A simple example e-commerce app built with modern tech stack android apps
   <summary>Bonus</summary>
   keystore password: qwerty123
 </details>
+
+## Demo
+
+https://github.com/user-attachments/assets/51cbbf96-51e1-4fb2-9111-e687d19c405f
+
