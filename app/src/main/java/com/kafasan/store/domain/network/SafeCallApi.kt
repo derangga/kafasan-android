@@ -11,7 +11,8 @@ suspend fun <T: Any> safeCallApi(call: suspend () -> Response<T>) : Result<T> {
         if (response.isSuccessful && response.body() != null) {
             Result.Success(response.body()!!)
         } else {
-            Result.Error(response.code(), Exception(response.errorBody()?.getErrorMessage()))
+            val message = response.errorBody()?.getErrorMessage()
+            Result.Error(response.code(), Exception(message))
         }
     } catch (e: Exception) {
         Result.Error(0, e)
@@ -22,7 +23,7 @@ fun ResponseBody.getErrorMessage(): String {
     return try {
         val jsonParser = JSONObject(this.string())
         jsonParser.getString("errors")
-    }catch (e: JSONException){
+    } catch (e: Exception){
         e.message.orEmpty()
     }
 }

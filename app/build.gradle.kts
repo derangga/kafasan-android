@@ -93,6 +93,8 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.androidx.ui.test.junit4)
     testImplementation(libs.jetpack.navigation.test)
+    testImplementation(libs.test.coroutines)
+    testImplementation(libs.mockwebserver)
     kspTest(libs.dagger.compiler)
 
     androidTestImplementation(libs.dagger.hilt.test)

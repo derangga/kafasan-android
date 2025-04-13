@@ -168,7 +168,6 @@ class DetailProductScreenTest {
 
         composeTestRule.setContent {
             val navController = rememberNavController()
-            val uiState = viewModel.product.collectAsState()
 
             DetailProductScreen(navController,1, viewModel)
         }
