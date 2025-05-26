@@ -77,10 +77,10 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                 height = animatedHeight,
                 collapsed = collapsed,
                 onFavoriteClick = {
-                    navController.navigate(Route.FAVORITE)
+                    navController.navigate(Route.Favorite.route)
                 },
                 onSearchClick = {
-                    navController.navigate(Route.SUGGEST_SEARCH)
+                    navController.navigate(Route.SuggestSearch.route)
                 }
             )
         }
@@ -107,7 +107,9 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                                     .height(220.dp),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                                 onClick = {
-                                    navController.navigate(Route.productDetail(product.id))
+                                    navController.navigate(
+                                        Route.ProductDetail.createRoute(product.id)
+                                    )
                                 }
                             ) {
                                 ProductItem(prd)

@@ -61,7 +61,7 @@ fun SuggestSearchScreen(navController: NavHostController, viewModel: SuggestSear
                             .testTag("searchBar"),
                         onSearchClicked = {
                             if (it.isNotEmpty()) {
-                                navController.navigate(Route.search(it))
+                                navController.navigate(Route.Search.createRoute(it))
                             }
                         },
                         onTextChange = {
@@ -94,7 +94,7 @@ fun SuggestSearchScreen(navController: NavHostController, viewModel: SuggestSear
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                         .clickable {
-                            navController.navigate(Route.productDetail(product.id))
+                            navController.navigate(Route.ProductDetail.createRoute(product.id))
                         }
                 ) {
                     Icon(

@@ -124,7 +124,7 @@ fun SearchScreen(navController: NavController, query: String, viewModel: SearchV
                                             ),
                                             onClick = {
                                                 navController.navigate(
-                                                    Route.productDetail(product.id)
+                                                    Route.ProductDetail.createRoute(product.id)
                                                 )
                                             }
                                         ) {

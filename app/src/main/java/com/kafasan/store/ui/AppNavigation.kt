@@ -6,6 +6,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kafasan.store.ui.pages.detail.DetailProductScreen
 import com.kafasan.store.ui.pages.detail.DetailProductViewModel
@@ -21,11 +22,14 @@ import com.kafasan.store.ui.pages.search.SuggestSearchViewModel
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(navController, startDestination = Route.HOME) {
-        composable(Route.HOME) {
+    NavHost(navController, startDestination = Route.Home.route) {
+        composable(Route.Home.route) {
             HomeScreen(navController, hiltViewModel<HomeViewModel>())
         }
-        composable(Route.PRODUCT_DETAIL) { navBackStackEntry ->
+        composable(
+            Route.ProductDetail.route,
+            deepLinks = listOf(navDeepLink { uriPattern = Route.ProductDetail.deeplinkURI() })
+        ) { navBackStackEntry ->
             val id = navBackStackEntry.arguments?.getString("id")
 
             id?.let {
@@ -36,13 +40,13 @@ fun AppNavigation() {
                 )
             }
         }
-        composable(Route.FAVORITE) {
+        composable(Route.Favorite.route) {
             FavoriteScreen(navController, hiltViewModel<FavoriteViewModel>())
         }
-        composable(Route.SUGGEST_SEARCH) {
+        composable(Route.SuggestSearch.route) {
             SuggestSearchScreen(navController, hiltViewModel<SuggestSearchViewModel>())
         }
-        composable(Route.SEARCH) { navBackStackEntry ->
+        composable(Route.Search.route) { navBackStackEntry ->
             val query = navBackStackEntry.arguments?.getString("query").orEmpty()
             SearchScreen(navController, query, hiltViewModel<SearchViewModel>())
         }

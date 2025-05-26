@@ -106,7 +106,9 @@ fun FavoriteScreen(navController: NavHostController, viewModel: FavoriteViewMode
                                         .height(220.dp),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                                     onClick = {
-                                        navController.navigate(Route.productDetail(product.id))
+                                        navController.navigate(
+                                            Route.ProductDetail.createRoute(product.id)
+                                        )
                                     }
                                 ) {
                                     ProductItem(product)
