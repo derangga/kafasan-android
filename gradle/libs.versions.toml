@@ -12,6 +12,8 @@ activityCompose = "1.10.0"
 composeBom = "2025.02.00"
 runtimeCompose = "2.8.7"
 
+datastore = "1.1.7"
+
 ksp = "2.0.21-1.0.27"
 room = "2.6.1"
 coroutines = "1.9.0"
@@ -76,6 +78,8 @@ okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-i
 
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockkVersion"}
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectricVersion" }
+
+datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

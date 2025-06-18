@@ -88,6 +88,8 @@ dependencies {
 
     implementation(libs.coroutines)
 
+    implementation(libs.datastore)
+
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.dagger.hilt.test)
