@@ -3,6 +3,7 @@ package com.kafasan.store.di
 import android.content.Context
 import androidx.room.Room
 import com.kafasan.store.BuildConfig
+import com.kafasan.store.domain.local.AppPreferences
 import com.kafasan.store.domain.local.KafasanDB
 import com.kafasan.store.domain.local.ProductDao
 import com.kafasan.store.domain.local.ProductRepository
@@ -88,5 +89,11 @@ object AppModule {
     @Singleton
     fun provideTimerUtility(): TimerUtility {
         return TimerUtilityImpl()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppPreferences(@ApplicationContext context: Context): AppPreferences {
+        return AppPreferences(context)
     }
 }
