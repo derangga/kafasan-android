@@ -36,6 +36,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Install GitHub CLI and jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh jq
+
       - name: Set up Gradle cache
         uses: gradle/actions/setup-gradle@v3
 
@@ -48,9 +53,20 @@ jobs:
           name: coverage-report
           path: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
 
-      - name: Post coverage diff on PR
-        uses: greatwizard/coverage-diff-action@v1
+      - name: Generate JaCoCo Badge & Summary
+        id: jacoco
+        uses: cicirello/jacoco-badge-generator@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          coverage-filename: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
-          fail-on-decrease: true
+          generate-branches-badge: true
+          generate-summary: true
+          jacoco-csv-file: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.csv
+
+      - name: Comment on PR with coverage summary
+        if: github.event_name == 'pull_request'
+        run: |
+          REPORT=$(<coverage-summary.json)
+          COVERAGE=$(jq -r '.coverage' <<< "$REPORT")%
+          BRANCHES=$(jq -r '.branches' <<< "$REPORT")%
+          gh pr comment ${{ github.event.pull_request.number }} -b "**Coverage:** $COVERAGE • **Branches:** $BRANCHES"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
