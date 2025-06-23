@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
+import com.kafasan.store.MainViewModel
 import com.kafasan.store.ui.pages.detail.DetailProductScreen
 import com.kafasan.store.ui.pages.detail.DetailProductViewModel
 import com.kafasan.store.ui.pages.favorite.FavoriteScreen
@@ -20,9 +21,11 @@ import com.kafasan.store.ui.pages.search.SuggestSearchScreen
 import com.kafasan.store.ui.pages.search.SuggestSearchViewModel
 
 @Composable
-fun AppNavigation(isRemember: Boolean) {
+fun AppNavigation(authState: MainViewModel.AuthState) {
     val navController = rememberNavController()
-    val startDestination = if (isRemember) Route.Home.route else Route.Login.route
+    val startDestination = if (authState == MainViewModel.AuthState.AUTHORIZE) {
+        Route.Home.route
+    } else Route.Login.route
     NavHost(navController, startDestination = startDestination) {
         composable(Route.Login.route) {
             LoginScreen(navController, hiltViewModel<LoginViewModel>())

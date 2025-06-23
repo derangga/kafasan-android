@@ -14,14 +14,18 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val prefs: AppPreferences
 ): ViewModel() {
-    private val _authState = MutableStateFlow(false)
+    private val _authState = MutableStateFlow(AuthState.CHECKING)
     val authState = _authState.asStateFlow()
 
     init {
         viewModelScope.launch {
             prefs.isRememberMe.collectLatest {
-                _authState.value = it
+                _authState.value = if (it) AuthState.AUTHORIZE else AuthState.UN_AUTHORIZE
             }
         }
+    }
+
+    enum class AuthState {
+        CHECKING, UN_AUTHORIZE, AUTHORIZE,
     }
 }
