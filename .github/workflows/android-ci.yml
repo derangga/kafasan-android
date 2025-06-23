@@ -60,14 +60,11 @@ jobs:
           generate-branches-badge: true
           generate-summary: true
           jacoco-csv-file: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.csv
-          output: coverage-summary.json
 
       - name: Comment on PR with coverage summary
         if: github.event_name == 'pull_request'
         run: |
-          REPORT=$(<coverage-summary.json)
-          COVERAGE=$(jq -r '.coverage' <<< "$REPORT")%
-          BRANCHES=$(jq -r '.branches' <<< "$REPORT")%
-          gh pr comment ${{ github.event.pull_request.number }} -b "**Coverage:** $COVERAGE • **Branches:** $BRANCHES"
+          gh pr comment ${{ github.event.pull_request.number }} \
+            -b "**Coverage:** ${{ steps.jacoco.outputs.coverage }}% • **Branches:** ${{ steps.jacoco.outputs.branches }}%"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
