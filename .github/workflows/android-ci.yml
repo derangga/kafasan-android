@@ -47,24 +47,68 @@ jobs:
       - name: Run tests and generate JaCoCo report
         run: ./gradlew testDebugUnitTest jacocoTestReport
 
+      - name: Extract coverage percentage
+        id: coverage
+        run: |
+          # Extract coverage percentage from JaCoCo report
+          COVERAGE=$(grep -oP 'line-rate="\K[0-9.]+' app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml | head -1)
+          COVERAGE_PERCENT=$(awk "BEGIN {printf \"%.2f\", $COVERAGE * 100}")
+          echo "Current coverage: $COVERAGE_PERCENT%"
+          
+          # Store coverage in GitHub Actions output
+          echo "coverage_percentage=$COVERAGE_PERCENT" >> $GITHUB_OUTPUT
+
+      - name: Get main branch coverage
+        id: main_coverage
+        run: |
+          # Try to get previous coverage from cache
+          echo "Trying to fetch main branch coverage..."
+          MAIN_COVERAGE=$(gh api repos/${{ github.repository }}/actions/artifacts --jq '.artifacts | map(select(.name == "main-coverage"))[0].id' || echo "")
+          
+          if [ -z "$MAIN_COVERAGE" ]; then
+            echo "No main branch coverage found, using 0 as default"
+            echo "main_coverage_percentage=0" >> $GITHUB_OUTPUT
+          else
+            gh api repos/${{ github.repository }}/actions/artifacts/$MAIN_COVERAGE/zip > main-coverage.zip
+            unzip main-coverage.zip -d main-coverage
+            MAIN_COVERAGE_VALUE=$(cat main-coverage/coverage.txt)
+            echo "Main branch coverage: $MAIN_COVERAGE_VALUE%"
+            echo "main_coverage_percentage=$MAIN_COVERAGE_VALUE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Compare coverage
+        run: |
+          CURRENT=${{ steps.coverage.outputs.coverage_percentage }}
+          MAIN=${{ steps.main_coverage.outputs.main_coverage_percentage }}
+          DIFFERENCE=$(awk "BEGIN {printf \"%.2f\", $CURRENT - $MAIN}")
+          
+          echo "Coverage comparison:"
+          echo "Current branch: $CURRENT%"
+          echo "Main branch: $MAIN%"
+          echo "Difference: $DIFFERENCE%"
+          
+          # Set a GitHub environment variable for the next step
+          echo "COVERAGE_DIFFERENCE=$DIFFERENCE" >> $GITHUB_ENV
+          
+          # Optionally fail if coverage drops below main
+          if (( $(echo "$DIFFERENCE < 0" | bc -l) )); then
+            echo "::warning::Coverage decreased by ${DIFFERENCE#-}% compared to main branch"
+            # Uncomment to fail the build if coverage decreases
+            # exit 1
+          fi
+
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
 
-      - name: Generate JaCoCo Badge & Summary
-        id: jacoco
-        uses: cicirello/jacoco-badge-generator@v2
-        with:
-          generate-branches-badge: true
-          generate-summary: true
-          jacoco-csv-file: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.csv
-
-      - name: Comment on PR with coverage summary
-        if: github.event_name == 'pull_request'
+      - name: Store main branch coverage (only on main)
+        if: github.ref == 'refs/heads/main'
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} \
-            -b "**Coverage:** ${{ steps.jacoco.outputs.coverage }}% • **Branches:** ${{ steps.jacoco.outputs.branches }}%"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "${{ steps.coverage.outputs.coverage_percentage }}" > coverage.txt
+          gh api repos/${{ github.repository }}/actions/artifacts \
+            -H "Accept: application/vnd.github+json" \
+            -F name=main-coverage \
+            -F retention_days=90 \
+            --input coverage.txt
