@@ -27,8 +27,7 @@ class ProductRepositoryTest {
     @Before
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(
-            context, KafasanDB::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(context, KafasanDB::class.java).build()
         productDao = db.productDao()
         productRepo = ProductRepositoryImpl(productDao)
     }
@@ -40,38 +39,42 @@ class ProductRepositoryTest {
     }
 
     @Test
-    fun insertProductShouldStoreData() = runTest {
-        // when
-        productRepo.insert(generateProduct())
+    fun insertProductShouldStoreData() {
+        runTest {
+            // when
+            productRepo.insert(generateProduct())
 
-        // then
-        val product = productRepo.getProductById(1)
-        Assert.assertEquals(1L, product?.id)
-        Assert.assertEquals("Product 1", product?.title)
-        Assert.assertEquals("product-1", product?.slug)
-        Assert.assertEquals("Desc 1", product?.description)
+            // then
+            val product = productRepo.getProductById(1)
+            Assert.assertEquals(1L, product?.id)
+            Assert.assertEquals("Product 1", product?.title)
+            Assert.assertEquals("product-1", product?.slug)
+            Assert.assertEquals("Desc 1", product?.description)
+        }
     }
 
     @Test
-    fun deleteProductShouldDeleteItemCorrectly() = runTest {
-        // when
-        val products = generateProducts()
-        products.forEach {
-            productDao.insert(it)
+    fun deleteProductShouldDeleteItemCorrectly() {
+        runTest {
+            // when
+            val products = generateProducts()
+            products.forEach {
+                productDao.insert(it)
+            }
+
+            // then
+            val productsInDb = productDao.getProducts()
+            Assert.assertEquals(5, productsInDb.size)
+
+            // when
+            productDao.delete(3)
+
+            // then
+            val afterDeleteProducts = productDao.getProducts()
+            Assert.assertEquals(4, afterDeleteProducts.size)
+            val deletedProduct = afterDeleteProducts.find { it.id == 3L }
+            Assert.assertNull(deletedProduct)
         }
-
-        // then
-        val productsInDb = productDao.getProducts()
-        Assert.assertEquals(5, productsInDb.size)
-
-        // when
-        productDao.delete(3)
-
-        // then
-        val afterDeleteProducts = productDao.getProducts()
-        Assert.assertEquals(4, afterDeleteProducts.size)
-        val deletedProduct = afterDeleteProducts.find { it.id == 3L }
-        Assert.assertNull(deletedProduct)
     }
 
     private fun generateProduct(): ProductEntity {

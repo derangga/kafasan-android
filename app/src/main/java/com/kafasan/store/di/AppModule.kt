@@ -33,7 +33,12 @@ object AppModule {
     @Singleton
     fun provideRequestHeader(): OkHttpClient {
         val httpLoginInterceptor = HttpLoggingInterceptor()
-        httpLoginInterceptor.level = if(BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+        httpLoginInterceptor.level =
+            if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
 
         return OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -67,9 +72,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTheMovieDatabase(@ApplicationContext context: Context): KafasanDB {
+    fun provideTheMovieDatabase(
+        @ApplicationContext context: Context,
+    ): KafasanDB {
         return Room.databaseBuilder(
-            context, KafasanDB::class.java, "KafasanDB"
+            context,
+            KafasanDB::class.java,
+            "KafasanDB",
         ).fallbackToDestructiveMigration().build()
     }
 
@@ -93,7 +102,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAppPreferences(@ApplicationContext context: Context): AppPreferences {
+    fun provideAppPreferences(
+        @ApplicationContext context: Context,
+    ): AppPreferences {
         return AppPreferences(context)
     }
 }

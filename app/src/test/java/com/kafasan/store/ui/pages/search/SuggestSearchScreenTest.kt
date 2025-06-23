@@ -13,7 +13,6 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.requestFocus
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.createGraph
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
@@ -39,7 +38,7 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(
     application = HiltTestApplication::class,
-    instrumentedPackages = ["androidx.loader.content"]
+    instrumentedPackages = ["androidx.loader.content"],
 )
 class SuggestSearchScreenTest {
     @get:Rule(order = 0)
@@ -49,11 +48,12 @@ class SuggestSearchScreenTest {
     val composeTestRule = createComposeRule()
 
     private val mockStoreRepo = mockk<StoreRepository>()
-    private val mockTimerUtility = object: TimerUtility {
-        override fun debounceTime(): Long {
-            return 0
+    private val mockTimerUtility =
+        object : TimerUtility {
+            override fun debounceTime(): Long {
+                return 0
+            }
         }
-    }
     private lateinit var viewModel: SuggestSearchViewModel
 
     @Before
@@ -72,26 +72,31 @@ class SuggestSearchScreenTest {
     fun searchScreen_showsProducts() {
         coEvery {
             mockStoreRepo.getProducts(title = any())
-        } returns Result.Success(
-            listOf(
-                Product(1, "Product 1", "product-1", 100, "Desc 1", null, emptyList(), "", ""),
-                Product(2, "Product 2", "product-2", 150, "Desc 2", null, emptyList(), "", "")
+        } returns
+            Result.Success(
+                listOf(
+                    Product(1, "Product 1", "product-1", 100, "Desc 1", null, emptyList(), "", ""),
+                    Product(2, "Product 2", "product-2", 150, "Desc 2", null, emptyList(), "", ""),
+                ),
             )
-        )
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val navController = TestNavHostController(context).apply {
-            navigatorProvider.addNavigator(ComposeNavigator())
-            setGraph(createGraph(startDestination = "suggest-search") {
-                composable("suggest-search") { }
-                composable("product/{id}") {
-                    Text("Product Detail Screen")
-                }
-                composable("search/{query}") {
-                    Text("Search Screen")
-                }
-            }, startDestinationArgs = null)
-            setCurrentDestination("suggest-search")
-        }
+        val navController =
+            TestNavHostController(context).apply {
+                navigatorProvider.addNavigator(ComposeNavigator())
+                setGraph(
+                    createGraph(startDestination = "suggest-search") {
+                        composable("suggest-search") { }
+                        composable("product/{id}") {
+                            Text("Product Detail Screen")
+                        }
+                        composable("search/{query}") {
+                            Text("Search Screen")
+                        }
+                    },
+                    startDestinationArgs = null,
+                )
+                setCurrentDestination("suggest-search")
+            }
 
         composeTestRule.setContent {
             SuggestSearchScreen(navController, viewModel)

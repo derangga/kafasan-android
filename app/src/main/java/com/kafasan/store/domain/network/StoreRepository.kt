@@ -6,7 +6,7 @@ interface StoreRepository {
     suspend fun getProducts(
         offset: Int? = null,
         limit: Int? = null,
-        title: String? = null
+        title: String? = null,
     ): Result<List<Product>>
 
     suspend fun getProductById(path: Int): Result<Product>

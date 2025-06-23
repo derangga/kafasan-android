@@ -38,7 +38,11 @@ import com.kafasan.store.ui.components.ProductItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(navController: NavController, query: String, viewModel: SearchViewModel) {
+fun SearchScreen(
+    navController: NavController,
+    query: String,
+    viewModel: SearchViewModel,
+) {
     val uiState = viewModel.products.collectAsStateWithLifecycle()
     LaunchedEffect("SearchScreen") {
         viewModel.searchProduct(query)
@@ -50,24 +54,26 @@ fun SearchScreen(navController: NavController, query: String, viewModel: SearchV
         topBar = {
             TopAppBar(
                 title = { Text(query, color = Color.White) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.AutoMirrored.Default.KeyboardArrowLeft,
                             "back",
-                            tint = Color.White
+                            tint = Color.White,
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { ip ->
         LazyColumn(
-            modifier = Modifier
-                .padding(ip)
+            modifier =
+                Modifier
+                    .padding(ip),
         ) {
             item {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -79,7 +85,7 @@ fun SearchScreen(navController: NavController, query: String, viewModel: SearchV
                     item {
                         Box(
                             modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             CenterCircularLoading()
                         }
@@ -91,42 +97,46 @@ fun SearchScreen(navController: NavController, query: String, viewModel: SearchV
                     if (products.isEmpty()) {
                         item {
                             Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp),
-                                contentAlignment = Alignment.Center
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp),
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     "No product found",
                                     fontSize = 20.sp,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = MaterialTheme.colorScheme.primary,
                                 )
                             }
                         }
                     } else {
                         items(products.size) { rowIndex ->
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
                             ) {
                                 for (columnIndex in 0..1) {
                                     val itemIndex = rowIndex * 2 + columnIndex
                                     if (itemIndex > -1 && itemIndex < products.size) {
                                         val product = products[itemIndex]
                                         Card(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .height(220.dp),
-                                            elevation = CardDefaults.cardElevation(
-                                                defaultElevation = 2.dp
-                                            ),
+                                            modifier =
+                                                Modifier
+                                                    .weight(1f)
+                                                    .height(220.dp),
+                                            elevation =
+                                                CardDefaults.cardElevation(
+                                                    defaultElevation = 2.dp,
+                                                ),
                                             onClick = {
                                                 navController.navigate(
-                                                    Route.ProductDetail.createRoute(product.id)
+                                                    Route.ProductDetail.createRoute(product.id),
                                                 )
-                                            }
+                                            },
                                         ) {
                                             ProductItem(product)
                                         }

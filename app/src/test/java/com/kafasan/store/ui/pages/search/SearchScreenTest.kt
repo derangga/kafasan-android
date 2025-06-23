@@ -2,7 +2,6 @@ package com.kafasan.store.ui.pages.search
 
 import android.content.Context
 import androidx.compose.material3.Text
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -34,7 +33,7 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(
     application = HiltTestApplication::class,
-    instrumentedPackages = ["androidx.loader.content"]
+    instrumentedPackages = ["androidx.loader.content"],
 )
 class SearchScreenTest {
     @get:Rule(order = 0)
@@ -50,12 +49,13 @@ class SearchScreenTest {
     fun setup() {
         hiltRule.inject()
 
-        coEvery { mockStoreRepo.getProducts(title = any()) } returns Result.Success(
-            listOf(
-                Product(1, "Product 1", "product-1", 100, "Desc 1", null, emptyList(), "", ""),
-                Product(2, "Product 2", "product-2", 150, "Desc 2", null, emptyList(), "", "")
+        coEvery { mockStoreRepo.getProducts(title = any()) } returns
+            Result.Success(
+                listOf(
+                    Product(1, "Product 1", "product-1", 100, "Desc 1", null, emptyList(), "", ""),
+                    Product(2, "Product 2", "product-2", 150, "Desc 2", null, emptyList(), "", ""),
+                ),
             )
-        )
 
         viewModel = SearchViewModel(mockStoreRepo)
     }
@@ -79,23 +79,28 @@ class SearchScreenTest {
     @Test
     fun searchScreen_navigatesToProductDetailOnCardClick() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val navController = TestNavHostController(context).apply {
-            navigatorProvider.addNavigator(ComposeNavigator())
-            setGraph(createGraph(startDestination = "search/{query}") {
-                composable("search/{query}") { }
-                composable("product/{id}") {
-                    Text("Product Detail Screen")
-                }
-            }, startDestinationArgs = null)
-            setCurrentDestination("search/{query}")
-        }
+        val navController =
+            TestNavHostController(context).apply {
+                navigatorProvider.addNavigator(ComposeNavigator())
+                setGraph(
+                    createGraph(startDestination = "search/{query}") {
+                        composable("search/{query}") { }
+                        composable("product/{id}") {
+                            Text("Product Detail Screen")
+                        }
+                    },
+                    startDestinationArgs = null,
+                )
+                setCurrentDestination("search/{query}")
+            }
 
         // Mock product repo response
-        coEvery { mockStoreRepo.getProducts() } returns Result.Success(
-            listOf(
-                Product(1, "Product 1", "product-1", 100, "Desc 1", null, emptyList(), "", ""),
+        coEvery { mockStoreRepo.getProducts() } returns
+            Result.Success(
+                listOf(
+                    Product(1, "Product 1", "product-1", 100, "Desc 1", null, emptyList(), "", ""),
+                ),
             )
-        )
 
         viewModel = SearchViewModel(mockStoreRepo)
 

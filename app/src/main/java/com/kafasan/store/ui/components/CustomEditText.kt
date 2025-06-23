@@ -1,7 +1,6 @@
 package com.kafasan.store.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -51,75 +50,83 @@ fun SearchBar(
 ) {
     var text by remember { mutableStateOf(TextFieldValue()) }
     Row(
-        modifier = Modifier
-            .height(height)
-            .fillMaxWidth()
-            .background(color = backgroundColor, shape = cornerShape),
+        modifier =
+            Modifier
+                .height(height)
+                .fillMaxWidth()
+                .background(color = backgroundColor, shape = cornerShape),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BasicTextField(
-            modifier = modifier
-                .weight(5f)
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+            modifier =
+                modifier
+                    .weight(5f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
             value = text,
             onValueChange = {
                 text = it
                 onTextChange(it.text)
             },
             enabled = isEnabled,
-            textStyle = LocalTextStyle.current.copy(
-                color = Color.Black,
-                fontSize = 14.sp,
-                lineHeight = 16.sp // smaller line height = shorter caret
-            ),
+            textStyle =
+                LocalTextStyle.current.copy(
+                    color = Color.Black,
+                    fontSize = 14.sp,
+                    lineHeight = 16.sp,
+                ),
             decorationBox = { innerTextField ->
                 if (text.text.isEmpty()) {
                     Text(
                         text = hint,
-                        style = LocalTextStyle.current.copy(
-                            color = Color.Gray,
-                            fontSize = 14.sp,
-                            lineHeight = 16.sp // smaller line height = shorter caret
-                        ),
+                        style =
+                            LocalTextStyle.current.copy(
+                                color = Color.Gray,
+                                fontSize = 14.sp,
+                                lineHeight = 16.sp,
+                            ),
                     )
                 }
                 innerTextField()
             },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Search
-            ),
+            keyboardOptions =
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Search,
+                ),
             keyboardActions = KeyboardActions(onSearch = { onSearchClicked(text.text) }),
-            singleLine = true
+            singleLine = true,
         )
         Box(
-            modifier = Modifier
-                .weight(1f)
-                .size(40.dp)
-                .background(color = Color.Transparent, shape = CircleShape)
-                .clickable {
-                    if (text.text.isNotEmpty()) {
-                        text = TextFieldValue(text = "")
-                        onTextChange("")
-                    }
-                },
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .size(40.dp)
+                    .background(color = Color.Transparent, shape = CircleShape)
+                    .clickable {
+                        if (text.text.isNotEmpty()) {
+                            text = TextFieldValue(text = "")
+                            onTextChange("")
+                        }
+                    },
         ) {
             if (text.text.isNotEmpty()) {
                 Icon(
                     Icons.Default.Close,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
                     contentDescription = "clear",
                     tint = MaterialTheme.colorScheme.primary,
                 )
             } else {
                 Icon(
                     Icons.Default.Search,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
                     contentDescription = "search",
                     tint = MaterialTheme.colorScheme.primary,
                 )

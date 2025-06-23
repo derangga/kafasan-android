@@ -36,7 +36,10 @@ import com.kafasan.store.ui.components.ProductItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoriteScreen(navController: NavHostController, viewModel: FavoriteViewModel) {
+fun FavoriteScreen(
+    navController: NavHostController,
+    viewModel: FavoriteViewModel,
+) {
     val uiState = viewModel.products.collectAsStateWithLifecycle()
 
     LaunchedEffect("FavoriteScreen") {
@@ -49,24 +52,26 @@ fun FavoriteScreen(navController: NavHostController, viewModel: FavoriteViewMode
         topBar = {
             TopAppBar(
                 title = { Text("Product Favorite", color = Color.White) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.AutoMirrored.Default.KeyboardArrowLeft,
                             "back",
-                            tint = Color.White
+                            tint = Color.White,
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { ip ->
         LazyColumn(
-            modifier = Modifier
-                .padding(ip)
+            modifier =
+                Modifier
+                    .padding(ip),
         ) {
             val products = uiState.value
             item {
@@ -76,40 +81,43 @@ fun FavoriteScreen(navController: NavHostController, viewModel: FavoriteViewMode
             if (products.isEmpty()) {
                 item {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             "You don't have any favorite products",
                             fontSize = 20.sp,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
             } else {
                 items(products.size) { rowIndex ->
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         for (columnIndex in 0..1) {
                             val itemIndex = rowIndex * 2 + columnIndex
                             if (itemIndex > -1 && itemIndex < products.size) {
                                 val product = products[itemIndex]
                                 Card(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(220.dp),
+                                    modifier =
+                                        Modifier
+                                            .weight(1f)
+                                            .height(220.dp),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                                     onClick = {
                                         navController.navigate(
-                                            Route.ProductDetail.createRoute(product.id)
+                                            Route.ProductDetail.createRoute(product.id),
                                         )
-                                    }
+                                    },
                                 ) {
                                     ProductItem(product)
                                 }

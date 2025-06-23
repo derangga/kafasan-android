@@ -47,7 +47,7 @@ import com.kafasan.store.ui.theme.redFavorite
 fun DetailProductScreen(
     navController: NavHostController,
     id: Int,
-    viewModel: DetailProductViewModel
+    viewModel: DetailProductViewModel,
 ) {
     val uiState = viewModel.product.collectAsStateWithLifecycle()
 
@@ -82,16 +82,17 @@ private fun DetailProductLoading(navController: NavHostController) {
             onClick = {
                 navController.popBackStack()
             },
-            modifier = Modifier
-                .background(Color(0x80F8F9FB), CircleShape)
-                .padding(16.dp, 24.dp)
+            modifier =
+                Modifier
+                    .background(Color(0x80F8F9FB), CircleShape)
+                    .padding(16.dp, 24.dp),
         ) {
             Icon(Icons.AutoMirrored.Default.KeyboardArrowLeft, contentDescription = "Back")
         }
 
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             CenterCircularLoading()
         }
@@ -99,35 +100,39 @@ private fun DetailProductLoading(navController: NavHostController) {
 }
 
 @Composable
-private fun DetailProductError(navController: NavHostController, retry: () -> Unit) {
+private fun DetailProductError(
+    navController: NavHostController,
+    retry: () -> Unit,
+) {
     Column(
-        modifier = Modifier.testTag("errorSection")
+        modifier = Modifier.testTag("errorSection"),
     ) {
         IconButton(
             onClick = {
                 navController.popBackStack()
             },
-            modifier = Modifier
-                .background(Color(0x80F8F9FB), CircleShape)
-                .padding(16.dp, 24.dp)
+            modifier =
+                Modifier
+                    .background(Color(0x80F8F9FB), CircleShape)
+                    .padding(16.dp, 24.dp),
         ) {
             Icon(Icons.AutoMirrored.Default.KeyboardArrowLeft, contentDescription = "Back")
         }
 
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(horizontal = 12.dp)
+                modifier = Modifier.padding(horizontal = 12.dp),
             ) {
                 Text(
                     "Something wrong with your request, please try again",
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
                 Button(
-                    onClick = retry
+                    onClick = retry,
                 ) {
                     Text("Retry")
                 }
@@ -141,28 +146,30 @@ private fun DetailProduct(
     navController: NavHostController,
     product: Product,
     isFavorite: Boolean,
-    onFavorite: () -> Unit
+    onFavorite: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     Column(
-        modifier = Modifier
-            .background(Color.White)
-            .verticalScroll(scrollState)
+        modifier =
+            Modifier
+                .background(Color.White)
+                .verticalScroll(scrollState),
     ) {
         Box {
             ImageCarousel(product.images, modifier = Modifier.testTag("imageCarousel"))
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp, 24.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp, 24.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(
                     onClick = {
                         navController.popBackStack()
                     },
-                    modifier = Modifier.background(Color(0x80F8F9FB), CircleShape)
+                    modifier = Modifier.background(Color(0x80F8F9FB), CircleShape),
                 ) {
                     Icon(Icons.AutoMirrored.Default.KeyboardArrowLeft, contentDescription = "Back")
                 }
@@ -170,59 +177,66 @@ private fun DetailProduct(
                 IconButton(
                     onClick = onFavorite,
                 ) {
-                    val icon = if (isFavorite) {
-                        Icons.Default.Favorite
-                    } else Icons.Default.FavoriteBorder
+                    val icon =
+                        if (isFavorite) {
+                            Icons.Default.Favorite
+                        } else {
+                            Icons.Default.FavoriteBorder
+                        }
                     val color = if (isFavorite) redFavorite else Color.White
                     val description = if (isFavorite) "Favorite" else "Favorite Border"
                     Icon(
                         imageVector = icon,
                         contentDescription = description,
-                        tint = color
+                        tint = color,
                     )
                 }
             }
         }
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 0.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 0.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .background(
-                        Color(0xFFF8F9FB),
-                        RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
-                    )
-                    .padding(horizontal = 16.dp, vertical = 24.dp)
-                    .fillMaxWidth()
+                modifier =
+                    Modifier
+                        .background(
+                            Color(0xFFF8F9FB),
+                            RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+                        )
+                        .padding(horizontal = 16.dp, vertical = 24.dp)
+                        .fillMaxWidth(),
             ) {
                 Text(
                     product.title,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.testTag("title")
+                    modifier = Modifier.testTag("title"),
                 )
                 Text(
                     "$${product.price}",
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .padding(top = 12.dp)
-                        .testTag("price")
+                    modifier =
+                        Modifier
+                            .padding(top = 12.dp)
+                            .testTag("price"),
                 )
                 Text("Details", modifier = Modifier.padding(top = 32.dp), fontSize = 18.sp)
                 Text(
                     product.description,
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .testTag("description"),
-                    color = Color(0xFF8891A5)
+                    modifier =
+                        Modifier
+                            .padding(top = 8.dp)
+                            .testTag("description"),
+                    color = Color(0xFF8891A5),
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.padding(top = 24.dp)
+                    modifier = Modifier.padding(top = 24.dp),
                 ) {
                     val context = LocalContext.current
                     OutlinedButton(
@@ -231,9 +245,10 @@ private fun DetailProduct(
                                 .show()
                         },
                         shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier
-                            .weight(1f),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary)
+                        modifier =
+                            Modifier
+                                .weight(1f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
                     ) {
                         Text("Add To Cart", color = MaterialTheme.colorScheme.secondary)
                     }
@@ -242,7 +257,7 @@ private fun DetailProduct(
                             Toast.makeText(context, product.title, Toast.LENGTH_SHORT).show()
                         },
                         shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     ) {
                         Text("Buy Now")
                     }

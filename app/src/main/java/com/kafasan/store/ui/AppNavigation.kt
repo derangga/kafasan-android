@@ -23,9 +23,13 @@ import com.kafasan.store.ui.pages.search.SuggestSearchViewModel
 @Composable
 fun AppNavigation(authState: MainViewModel.AuthState) {
     val navController = rememberNavController()
-    val startDestination = if (authState == MainViewModel.AuthState.AUTHORIZE) {
-        Route.Home.route
-    } else Route.Login.route
+    val startDestination =
+        if (authState == MainViewModel.AuthState.AUTHORIZE) {
+            Route.Home.route
+        } else {
+            Route.Login.route
+        }
+
     NavHost(navController, startDestination = startDestination) {
         composable(Route.Login.route) {
             LoginScreen(navController, hiltViewModel<LoginViewModel>())
@@ -35,7 +39,7 @@ fun AppNavigation(authState: MainViewModel.AuthState) {
         }
         composable(
             Route.ProductDetail.route,
-            deepLinks = listOf(navDeepLink { uriPattern = Route.ProductDetail.deeplinkURI() })
+            deepLinks = listOf(navDeepLink { uriPattern = Route.ProductDetail.deeplinkURI() }),
         ) { navBackStackEntry ->
             val id = navBackStackEntry.arguments?.getString("id")
 
@@ -43,7 +47,7 @@ fun AppNavigation(authState: MainViewModel.AuthState) {
                 DetailProductScreen(
                     navController = navController,
                     id = it.toInt(),
-                    viewModel = hiltViewModel<DetailProductViewModel>()
+                    viewModel = hiltViewModel<DetailProductViewModel>(),
                 )
             }
         }

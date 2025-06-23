@@ -40,7 +40,10 @@ import com.kafasan.store.ui.Route
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel) {
+fun LoginScreen(
+    navController: NavHostController,
+    viewModel: LoginViewModel,
+) {
     val maxEmail = 50
     val maxPassword = 50
     var email by remember { mutableStateOf("") }
@@ -60,27 +63,30 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(
-            left = 12.dp,
-            top = 12.dp,
-            right = 12.dp,
-            bottom = 12.dp
-        ),
+        contentWindowInsets =
+            WindowInsets(
+                left = 12.dp,
+                top = 12.dp,
+                right = 12.dp,
+                bottom = 12.dp,
+            ),
         topBar = {
             TopAppBar(
                 title = { Text("Welcome", color = Color.White) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ),
             )
-        }
+        },
     ) { ip ->
         Column(
-            modifier = Modifier
-                .padding(ip)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .padding(ip)
+                    .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             OutlinedTextField(
                 value = email,
@@ -92,10 +98,13 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel) {
                 supportingText = {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = if (isEmailError) {
-                            Arrangement.SpaceBetween
-                        } else Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
+                        horizontalArrangement =
+                            if (isEmailError) {
+                                Arrangement.SpaceBetween
+                            } else {
+                                Arrangement.End
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (isEmailError) {
                             Text(uiState.value.error.message)
@@ -105,7 +114,7 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel) {
                         )
                     }
                 },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             )
             Spacer(modifier = Modifier.padding(top = 8.dp))
             OutlinedTextField(
@@ -119,10 +128,13 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel) {
                 supportingText = {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = if (isPasswordError) {
-                            Arrangement.SpaceBetween
-                        } else Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
+                        horizontalArrangement =
+                            if (isPasswordError) {
+                                Arrangement.SpaceBetween
+                            } else {
+                                Arrangement.End
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (isPasswordError) {
                             Text(uiState.value.error.message)
@@ -130,26 +142,27 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel) {
                         Text(
                             "${password.length}/$maxPassword",
                             modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.End
+                            textAlign = TextAlign.End,
                         )
                     }
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
-                keyboardActions = KeyboardActions(
-                    onGo = {
-                        keyboardController?.hide()
-                        viewModel.simulateLogin(checked, email, password)
-                    }
-                )
+                keyboardActions =
+                    KeyboardActions(
+                        onGo = {
+                            keyboardController?.hide()
+                            viewModel.simulateLogin(checked, email, password)
+                        },
+                    ),
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Checkbox(
                     checked = checked,
-                    onCheckedChange = { checked = it }
+                    onCheckedChange = { checked = it },
                 )
                 Text("Remember me")
             }
@@ -157,7 +170,7 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel) {
             Button(
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 enabled = !uiState.value.loading,
-                onClick = { viewModel.simulateLogin(checked, email, password) }
+                onClick = { viewModel.simulateLogin(checked, email, password) },
             ) {
                 if (uiState.value.loading) {
                     CircularProgressIndicator()

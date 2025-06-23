@@ -13,11 +13,11 @@ interface StoreService {
     suspend fun getProducts(
         @Query("offset") offset: Int? = null,
         @Query("limit") limit: Int? = null,
-        @Query("title") title: String? = null
-    ) : Response<List<Product>>
+        @Query("title") title: String? = null,
+    ): Response<List<Product>>
 
     @GET(PRODUCT_BY_ID)
     suspend fun getProductById(
-        @Path("id") id: Int
-    ) : Response<Product>
+        @Path("id") id: Int,
+    ): Response<Product>
 }

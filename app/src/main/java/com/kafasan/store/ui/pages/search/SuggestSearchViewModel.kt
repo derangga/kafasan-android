@@ -18,36 +18,38 @@ import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
-class SuggestSearchViewModel @Inject constructor(
-    private val timerUtility: TimerUtility,
-    private val storeRepo: StoreRepository
-): ViewModel() {
-    private val _products = MutableStateFlow<List<Product>>(emptyList())
-    val products = _products.asStateFlow()
+class SuggestSearchViewModel
+    @Inject
+    constructor(
+        private val timerUtility: TimerUtility,
+        private val storeRepo: StoreRepository,
+    ) : ViewModel() {
+        private val _products = MutableStateFlow<List<Product>>(emptyList())
+        val products = _products.asStateFlow()
 
-    private val _query = MutableStateFlow("")
+        private val query = MutableStateFlow("")
 
-    init {
-        viewModelScope.launch {
-            _query
-                .debounce(timerUtility.debounceTime())
-                .distinctUntilChanged()
-                .collectLatest { query ->
-                    if (query.isNotBlank()) {
-                        when(val products = storeRepo.getProducts(title = query)) {
-                            is Result.Error -> Unit // do nothing
-                            is Result.Success -> {
-                                _products.value = products.data
+        init {
+            viewModelScope.launch {
+                query
+                    .debounce(timerUtility.debounceTime())
+                    .distinctUntilChanged()
+                    .collectLatest { query ->
+                        if (query.isNotBlank()) {
+                            when (val products = storeRepo.getProducts(title = query)) {
+                                is Result.Error -> Unit // do nothing
+                                is Result.Success -> {
+                                    _products.value = products.data
+                                }
                             }
+                        } else {
+                            _products.value = emptyList()
                         }
-                    } else {
-                        _products.value = emptyList()
                     }
-                }
+            }
+        }
+
+        fun getSuggestion(query: String) {
+            this.query.value = query
         }
     }
-
-    fun getSuggestion(query: String) {
-        _query.value = query
-    }
-}

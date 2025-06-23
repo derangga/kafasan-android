@@ -1,3 +1,5 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,7 @@ plugins {
     alias(libs.plugins.dagger)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.jetpack.nav.safeargs)
+    alias(libs.plugins.ktlint)
 }
 
 android {
@@ -28,7 +31,7 @@ android {
             isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -48,6 +51,22 @@ android {
         unitTests {
             isIncludeAndroidResources = true
         }
+    }
+
+    sourceSets["main"].java.srcDir("src/main/kotlin")
+}
+
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    android.set(true)
+    ignoreFailures.set(false)
+    reporters {
+        reporter(ReporterType.PLAIN)
+        reporter(ReporterType.CHECKSTYLE)
+    }
+    disabledRules.set(setOf("final-newline", "no-wildcard-imports"))
+    filter {
+        exclude("**/generated/**")
+        include("**/kotlin/**")
     }
 }
 

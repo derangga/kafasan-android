@@ -11,21 +11,25 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
-    private val prefs: AppPreferences
-): ViewModel() {
-    private val _authState = MutableStateFlow(AuthState.CHECKING)
-    val authState = _authState.asStateFlow()
+class MainViewModel
+    @Inject
+    constructor(
+        private val prefs: AppPreferences,
+    ) : ViewModel() {
+        private val _authState = MutableStateFlow(AuthState.CHECKING)
+        val authState = _authState.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            prefs.isRememberMe.collectLatest {
-                _authState.value = if (it) AuthState.AUTHORIZE else AuthState.UN_AUTHORIZE
+        init {
+            viewModelScope.launch {
+                prefs.isRememberMe.collectLatest {
+                    _authState.value = if (it) AuthState.AUTHORIZE else AuthState.UN_AUTHORIZE
+                }
             }
         }
-    }
 
-    enum class AuthState {
-        CHECKING, UN_AUTHORIZE, AUTHORIZE,
+        enum class AuthState {
+            CHECKING,
+            UN_AUTHORIZE,
+            AUTHORIZE,
+        }
     }
-}

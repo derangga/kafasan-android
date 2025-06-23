@@ -14,22 +14,24 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchViewModel @Inject constructor(
-    private val storeRepo: StoreRepository
-): ViewModel() {
-    private val _products = MutableStateFlow<ApiLoad<List<Product>>>(ApiLoad.Loading)
-    val products: StateFlow<ApiLoad<List<Product>>> = _products.asStateFlow()
+class SearchViewModel
+    @Inject
+    constructor(
+        private val storeRepo: StoreRepository,
+    ) : ViewModel() {
+        private val _products = MutableStateFlow<ApiLoad<List<Product>>>(ApiLoad.Loading)
+        val products: StateFlow<ApiLoad<List<Product>>> = _products.asStateFlow()
 
-    fun searchProduct(query: String) {
-        viewModelScope.launch {
-            when(val result = storeRepo.getProducts(title = query)) {
-                is Result.Error -> {
-                    _products.value = ApiLoad.Error(result.exception)
-                }
-                is Result.Success -> {
-                    _products.value = ApiLoad.Success(result.data)
+        fun searchProduct(query: String) {
+            viewModelScope.launch {
+                when (val result = storeRepo.getProducts(title = query)) {
+                    is Result.Error -> {
+                        _products.value = ApiLoad.Error(result.exception)
+                    }
+                    is Result.Success -> {
+                        _products.value = ApiLoad.Success(result.data)
+                    }
                 }
             }
         }
     }
-}

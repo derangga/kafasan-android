@@ -31,6 +31,8 @@ mockwebserver = "4.12.0"
 
 coil = "3.1.0"
 
+ktlint = "12.3.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -89,3 +91,4 @@ kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 dagger = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }
 jetpack-nav-safeargs = { id = "androidx.navigation.safeargs" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
