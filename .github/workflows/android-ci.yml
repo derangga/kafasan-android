@@ -197,3 +197,11 @@ jobs:
                 body: commentBody
               });
             }
+      - name: Add coverage to job summary
+        run: |
+          echo "### Code Coverage Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Current PR Coverage | ${{ steps.coverage.outputs.coverage_percentage }}% |" >> $GITHUB_STEP_SUMMARY
+          echo "| Main Branch Coverage | ${{ steps.main_coverage.outputs.main_coverage_percentage }}% |" >> $GITHUB_STEP_SUMMARY
+          echo "| Difference | $(echo "${{ steps.coverage.outputs.coverage_percentage}} - ${{ steps.main_coverage.outputs.main_coverage_percentage}}" | bc)% |" >> $GITHUB_STEP_SUMMARY
