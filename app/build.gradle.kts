@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.jetpack.nav.safeargs)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.jacoco)
 }
 
 android {
@@ -68,6 +69,23 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         exclude("**/generated/**")
         include("**/kotlin/**")
     }
+}
+
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val fileTree = fileTree("${layout.buildDirectory}/intermediates/javac/debug/classes")
+    val kotlinTree = fileTree("${layout.buildDirectory}/tmp/kotlin-classes/debug")
+
+    classDirectories.setFrom(files(fileTree, kotlinTree))
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    executionData.setFrom(fileTree(layout.buildDirectory).include("**/*.exec"))
 }
 
 dependencies {

@@ -22,19 +22,35 @@ jobs:
       - name: Run ktlint
         run: ./gradlew ktlintCheck
 
-  test:
-    name: Run Unit Tests
+  test-and-coverage:
+    name: Run Unit Tests & Compare Coverage
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: '17'
 
-      - name: Run unit tests
-        run: ./gradlew testDebugUnitTest
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Run tests and generate JaCoCo report
+        run: ./gradlew testDebugUnitTest jacocoTestReport
+
+      - name: Upload coverage report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+
+      - name: Post coverage diff on PR
+        uses: greatwizard/coverage-diff-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          coverage-filename: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+          fail-on-decrease: true
