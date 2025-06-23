@@ -95,19 +95,25 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         csv.required.set(true)
     }
 
-    val javaClasses = fileTree("$buildDir/intermediates/javac/debug/classes") {
-        exclude(
-            "**/R.class", "**/R$*.class",
-            "**/BuildConfig.*", "**/Manifest*.*",
-            "**/*Test*.*"
-        )
-    }
-    val kotlinClasses = fileTree("$buildDir/tmp/kotlin-classes/debug") {
-        exclude(
-            "**/R.class", "**/R$*.class",
-            "**/BuildConfig.*", "**/*Test*.*"
-        )
-    }
+    val javaClasses =
+        fileTree("$buildDir/intermediates/javac/debug/classes") {
+            exclude(
+                "**/R.class",
+                "**/R$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*",
+            )
+        }
+    val kotlinClasses =
+        fileTree("$buildDir/tmp/kotlin-classes/debug") {
+            exclude(
+                "**/R.class",
+                "**/R$*.class",
+                "**/BuildConfig.*",
+                "**/*Test*.*",
+            )
+        }
 
     classDirectories.setFrom(files(javaClasses, kotlinClasses))
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
