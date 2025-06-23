@@ -21,34 +21,35 @@ import com.kafasan.store.data.Product
 @Composable
 fun ProductItem(product: Product) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(250.dp),
-        contentAlignment = Alignment.BottomStart
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(250.dp),
+        contentAlignment = Alignment.BottomStart,
     ) {
         AsyncImage(
             model = product.images.firstOrNull().orEmpty(),
             contentDescription = product.title,
             modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
         )
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black.copy(alpha = .4f))
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = .4f)),
         ) {
             Column(
-                modifier = Modifier.padding(12.dp, 4.dp)
+                modifier = Modifier.padding(12.dp, 4.dp),
             ) {
                 Text(
                     product.title,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.White
+                    color = Color.White,
                 )
                 Text("Price: $${product.price}", fontSize = 12.sp, color = Color.White)
             }
         }
-
     }
 }

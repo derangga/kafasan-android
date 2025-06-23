@@ -2,7 +2,7 @@ package com.kafasan.store.domain.network
 
 import retrofit2.Response
 
-suspend fun <T: Any> safeCallApi(call: suspend () -> Response<T>) : Result<T> {
+suspend fun <T : Any> safeCallApi(call: suspend () -> Response<T>): Result<T> {
     return try {
         val response = call.invoke()
         if (response.isSuccessful && response.body() != null) {

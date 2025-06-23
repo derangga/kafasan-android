@@ -1,0 +1,199 @@
+name: Android CI
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  linter:
+    name: Run ktlint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Run ktlint
+        run: ./gradlew ktlintCheck
+
+  test-and-coverage:
+    name: Run Unit Tests & Compare Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install GitHub CLI and jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh jq
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Run tests and generate JaCoCo report
+        run: ./gradlew testDebugUnitTest jacocoTestReport
+
+      - name: Extract coverage percentage
+        id: coverage
+        run: |
+          # Install xmllint for proper XML parsing (more reliable than grep)
+          sudo apt-get install -y libxml2-utils
+
+          REPORT_FILE="app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+
+          echo "Checking for report file at $REPORT_FILE"
+          if [ ! -f "$REPORT_FILE" ]; then
+            echo "::error::JaCoCo report file not found at $REPORT_FILE"
+            ls -la app/build/reports/jacoco/jacocoTestReport/ || true
+            exit 1
+          fi
+
+          echo "Trying xmllint method first..."
+          COVERED=$(xmllint --xpath 'sum(//report/counter[@type="LINE"]/@covered)' "$REPORT_FILE" 2>/dev/null || echo "ERROR")
+          MISSED=$(xmllint --xpath 'sum(//report/counter[@type="LINE"]/@missed)' "$REPORT_FILE" 2>/dev/null || echo "ERROR")
+
+          if [[ "$COVERED" != "ERROR" && "$MISSED" != "ERROR" ]]; then
+            echo "Successfully parsed with xmllint"
+            echo "Covered lines: $COVERED"
+            echo "Missed lines: $MISSED"
+          else
+            echo "Falling back to grep method..."
+            COVERAGE_LINE=$(grep -m 1 'LINE"' "$REPORT_FILE" || echo "")
+            if [ -z "$COVERAGE_LINE" ]; then
+              echo "::error::No LINE coverage data found in report"
+              exit 1
+            fi
+
+            COVERED=$(echo "$COVERAGE_LINE" | grep -o 'covered="[0-9]*"' | cut -d'"' -f2 || echo "0")
+            MISSED=$(echo "$COVERAGE_LINE" | grep -o 'missed="[0-9]*"' | cut -d'"' -f2 || echo "0")
+          fi
+
+          # Ensure we have numeric values
+          COVERED=${COVERED:-0}
+          MISSED=${MISSED:-0}
+
+          echo "Final values - Covered: $COVERED, Missed: $MISSED"
+
+          # Calculate total and percentage
+          TOTAL=$((COVERED + MISSED))
+          if [ "$TOTAL" -eq 0 ]; then
+            echo "::error::No lines found for coverage calculation"
+            exit 1
+          fi
+
+          # Use bc for floating point calculation to avoid awk issues
+          COVERAGE_PERCENT=$(echo "scale=2; $COVERED * 100 / $TOTAL" | bc)
+          echo "Current coverage: $COVERAGE_PERCENT%"
+          echo "coverage_percentage=$COVERAGE_PERCENT" >> $GITHUB_OUTPUT
+
+      - name: Get main branch coverage
+        id: main_coverage
+        run: |
+          # Try to get previous coverage from cache
+          echo "Trying to fetch main branch coverage..."
+          MAIN_COVERAGE=$(gh api repos/${{ github.repository }}/actions/artifacts --jq '.artifacts | map(select(.name == "main-coverage"))[0].id' || echo "")
+          
+          if [ -z "$MAIN_COVERAGE" ]; then
+            echo "No main branch coverage found, using 0 as default"
+            echo "main_coverage_percentage=0" >> $GITHUB_OUTPUT
+          else
+            gh api repos/${{ github.repository }}/actions/artifacts/$MAIN_COVERAGE/zip > main-coverage.zip
+            unzip main-coverage.zip -d main-coverage
+            MAIN_COVERAGE_VALUE=$(cat main-coverage/coverage.txt)
+            echo "Main branch coverage: $MAIN_COVERAGE_VALUE%"
+            echo "main_coverage_percentage=$MAIN_COVERAGE_VALUE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Compare coverage
+        run: |
+          CURRENT=${{ steps.coverage.outputs.coverage_percentage }}
+          MAIN=${{ steps.main_coverage.outputs.main_coverage_percentage }}
+          DIFFERENCE=$(awk "BEGIN {printf \"%.2f\", $CURRENT - $MAIN}")
+          
+          echo "Coverage comparison:"
+          echo "Current branch: $CURRENT%"
+          echo "Main branch: $MAIN%"
+          echo "Difference: $DIFFERENCE%"
+          
+          # Set a GitHub environment variable for the next step
+          echo "COVERAGE_DIFFERENCE=$DIFFERENCE" >> $GITHUB_ENV
+          
+          # Optionally fail if coverage drops below main
+          if (( $(echo "$DIFFERENCE < 0" | bc -l) )); then
+            echo "::warning::Coverage decreased by ${DIFFERENCE#-}% compared to main branch"
+            # Uncomment to fail the build if coverage decreases
+            # exit 1
+          fi
+
+      - name: Upload coverage report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+
+      - name: Store main branch coverage (only on main)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ steps.coverage.outputs.coverage_percentage }}" > coverage.txt
+          gh api repos/${{ github.repository }}/actions/artifacts \
+            -H "Accept: application/vnd.github+json" \
+            -F name=main-coverage \
+            -F retention_days=90 \
+            --input coverage.txt
+
+      - name: Comment on PR with coverage results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existingComment = comments.find(comment => 
+              comment.body.includes('## Code Coverage Report')
+            );
+
+            const coverage = `${{ steps.coverage.outputs.coverage_percentage }}`;
+            const mainCoverage = `${{ steps.main_coverage.outputs.main_coverage_percentage }}`;
+            const diff = (coverage - mainCoverage).toFixed(2);
+
+            const commentBody = `
+            ## Code Coverage Report
+            ✅ **Current PR Coverage**: ${coverage}%
+            ⏮️ **Main Branch Coverage**: ${mainCoverage}%
+            📊 **Difference**: ${diff}%
+
+            _Generated by GitHub Actions_`;
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }

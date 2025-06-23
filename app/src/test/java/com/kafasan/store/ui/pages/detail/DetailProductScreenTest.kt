@@ -30,10 +30,9 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(
     application = HiltTestApplication::class,
-    instrumentedPackages = ["androidx.loader.content"]
+    instrumentedPackages = ["androidx.loader.content"],
 )
 class DetailProductScreenTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -65,28 +64,30 @@ class DetailProductScreenTest {
 
         coEvery {
             mockStoreRepo.getProductById(any())
-        } returns Result.Success(
-            Product(
-                id = 1,
-                title = "Product 1",
-                slug = "product-1",
-                price = 100,
-                description = "Desc 1",
-                category = null,
-                images = listOf(
-                    "https://i.imgur.com/cHddUCu.jpeg",
-                    "https://i.imgur.com/CFOjAgK.jpeg",
-                    "https://i.imgur.com/wbIMMme.jpeg"
+        } returns
+            Result.Success(
+                Product(
+                    id = 1,
+                    title = "Product 1",
+                    slug = "product-1",
+                    price = 100,
+                    description = "Desc 1",
+                    category = null,
+                    images =
+                        listOf(
+                            "https://i.imgur.com/cHddUCu.jpeg",
+                            "https://i.imgur.com/CFOjAgK.jpeg",
+                            "https://i.imgur.com/wbIMMme.jpeg",
+                        ),
+                    creationAt = "",
+                    updatedAt = "",
                 ),
-                creationAt = "",
-                updatedAt = ""
             )
-        )
 
         composeTestRule.setContent {
             val navController = rememberNavController()
 
-            DetailProductScreen(navController,1, viewModel)
+            DetailProductScreen(navController, 1, viewModel)
         }
 
         composeTestRule.onNodeWithTag("imageCarousel")
@@ -114,29 +115,31 @@ class DetailProductScreenTest {
 
         coEvery {
             mockStoreRepo.getProductById(any())
-        } returns Result.Success(
-            Product(
-                id = 1,
-                title = "Product 1",
-                slug = "product-1",
-                price = 100,
-                description = "Desc 1",
-                category = null,
-                images = listOf(
-                    "https://i.imgur.com/cHddUCu.jpeg",
-                    "https://i.imgur.com/CFOjAgK.jpeg",
-                    "https://i.imgur.com/wbIMMme.jpeg"
+        } returns
+            Result.Success(
+                Product(
+                    id = 1,
+                    title = "Product 1",
+                    slug = "product-1",
+                    price = 100,
+                    description = "Desc 1",
+                    category = null,
+                    images =
+                        listOf(
+                            "https://i.imgur.com/cHddUCu.jpeg",
+                            "https://i.imgur.com/CFOjAgK.jpeg",
+                            "https://i.imgur.com/wbIMMme.jpeg",
+                        ),
+                    creationAt = "",
+                    updatedAt = "",
                 ),
-                creationAt = "",
-                updatedAt = ""
             )
-        )
 
         composeTestRule.setContent {
             val navController = rememberNavController()
             val uiState = viewModel.product.collectAsState()
 
-            DetailProductScreen(navController,1, viewModel)
+            DetailProductScreen(navController, 1, viewModel)
         }
 
         composeTestRule.onNodeWithTag("imageCarousel")
@@ -169,7 +172,7 @@ class DetailProductScreenTest {
         composeTestRule.setContent {
             val navController = rememberNavController()
 
-            DetailProductScreen(navController,1, viewModel)
+            DetailProductScreen(navController, 1, viewModel)
         }
 
         composeTestRule.onNodeWithTag("errorSection")

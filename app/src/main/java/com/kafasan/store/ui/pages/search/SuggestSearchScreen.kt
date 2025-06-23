@@ -38,7 +38,10 @@ import com.kafasan.store.ui.components.SearchBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SuggestSearchScreen(navController: NavHostController, viewModel: SuggestSearchViewModel) {
+fun SuggestSearchScreen(
+    navController: NavHostController,
+    viewModel: SuggestSearchViewModel,
+) {
     val uiState = viewModel.products.collectAsStateWithLifecycle()
     val focusRequester = remember { FocusRequester() }
 
@@ -46,7 +49,8 @@ fun SuggestSearchScreen(navController: NavHostController, viewModel: SuggestSear
     LaunchedEffect("SearchProduct") {
         try {
             focusRequester.requestFocus()
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
     }
 
     Scaffold(
@@ -57,8 +61,9 @@ fun SuggestSearchScreen(navController: NavHostController, viewModel: SuggestSear
                 title = {
                     SearchBar(
                         hint = "samsung j-prime",
-                        modifier = Modifier.focusRequester(focusRequester)
-                            .testTag("searchBar"),
+                        modifier =
+                            Modifier.focusRequester(focusRequester)
+                                .testTag("searchBar"),
                         onSearchClicked = {
                             if (it.isNotEmpty()) {
                                 navController.navigate(Route.Search.createRoute(it))
@@ -66,51 +71,53 @@ fun SuggestSearchScreen(navController: NavHostController, viewModel: SuggestSear
                         },
                         onTextChange = {
                             viewModel.getSuggestion(it)
-                        }
+                        },
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.AutoMirrored.Default.KeyboardArrowLeft,
                             "back",
-                            tint = Color.White
+                            tint = Color.White,
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { ip ->
         LazyColumn(
-            modifier = Modifier.padding(ip)
+            modifier = Modifier.padding(ip),
         ) {
             items(uiState.value) { product ->
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .clickable {
-                            navController.navigate(Route.ProductDetail.createRoute(product.id))
-                        }
+                    modifier =
+                        Modifier
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                            .clickable {
+                                navController.navigate(Route.ProductDetail.createRoute(product.id))
+                            },
                 ) {
                     Icon(
                         Icons.Default.Search,
                         contentDescription = "search",
-                        tint = Color.Gray
+                        tint = Color.Gray,
                     )
                     Text(
                         product.title,
                         fontSize = 14.sp,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                     Icon(
                         Icons.AutoMirrored.Default.KeyboardArrowRight,
                         contentDescription = "search",
-                        tint = Color.Gray
+                        tint = Color.Gray,
                     )
                 }
             }

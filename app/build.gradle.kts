@@ -1,3 +1,5 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,8 @@ plugins {
     alias(libs.plugins.dagger)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.jetpack.nav.safeargs)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.jacoco)
 }
 
 android {
@@ -28,8 +32,12 @@ android {
             isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
+        }
+
+        debug {
+            enableUnitTestCoverage = true
         }
     }
     compileOptions {
@@ -49,6 +57,46 @@ android {
             isIncludeAndroidResources = true
         }
     }
+
+    sourceSets["main"].java.srcDir("src/main/kotlin")
+}
+
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    android.set(true)
+    ignoreFailures.set(false)
+    reporters {
+        reporter(ReporterType.PLAIN)
+        reporter(ReporterType.CHECKSTYLE)
+    }
+    disabledRules.set(setOf("final-newline", "no-wildcard-imports"))
+    filter {
+        exclude("**/generated/**")
+        include("**/kotlin/**")
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    extensions.configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(true)
+    }
+
+    val fileTree = fileTree("$buildDir/intermediates/javac/debug/classes")
+    val kotlinTree = fileTree("$buildDir/tmp/kotlin-classes/debug")
+
+    classDirectories.setFrom(files(fileTree, kotlinTree))
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    executionData.setFrom(fileTree(layout.buildDirectory).include("**/*.exec"))
 }
 
 dependencies {

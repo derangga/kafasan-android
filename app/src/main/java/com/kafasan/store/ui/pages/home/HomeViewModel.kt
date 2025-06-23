@@ -14,14 +14,15 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val repository: StoreRepository
-) :ViewModel() {
-
-    fun getProducts(): Flow<PagingData<Product>> {
-        return Pager(
-            config = PagingConfig(pageSize = 1, enablePlaceholders = false),
-            pagingSourceFactory = { StorePagingSource(repository) }
-        ).flow.cachedIn(viewModelScope)
+class HomeViewModel
+    @Inject
+    constructor(
+        private val repository: StoreRepository,
+    ) : ViewModel() {
+        fun getProducts(): Flow<PagingData<Product>> {
+            return Pager(
+                config = PagingConfig(pageSize = 1, enablePlaceholders = false),
+                pagingSourceFactory = { StorePagingSource(repository) },
+            ).flow.cachedIn(viewModelScope)
+        }
     }
-}

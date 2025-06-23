@@ -16,7 +16,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.net.HttpURLConnection
 
 class StoreRepositoryTest {
-
     @get:Rule
     val coroutineRule = TestCoroutineRule()
 
@@ -32,56 +31,62 @@ class StoreRepositoryTest {
     }
 
     @Test
-    fun testGetProductsAndReturn200() = runTest {
-        val products = generateProducts()
-        val json = convertToJson(products)
-        val res = MockResponse()
-        res.setBody(json)
-        res.setResponseCode(200)
-        mockWebServer.enqueue(res)
+    fun testGetProductsAndReturn200() {
+        runTest {
+            val products = generateProducts()
+            val json = convertToJson(products)
+            val res = MockResponse()
+            res.setBody(json)
+            res.setResponseCode(200)
+            mockWebServer.enqueue(res)
 
-        val result = storeRepository.getProducts()
-        val productResponse = (result as? Result.Success)?.data.orEmpty()
+            val result = storeRepository.getProducts()
+            val productResponse = (result as? Result.Success)?.data.orEmpty()
 
-        mockWebServer.takeRequest()
+            mockWebServer.takeRequest()
 
-        Assert.assertTrue(result is Result.Success)
-        Assert.assertEquals(products.size, productResponse.size)
+            Assert.assertTrue(result is Result.Success)
+            Assert.assertEquals(products.size, productResponse.size)
+        }
     }
 
     @Test
-    fun testGetProductsAndReturn400() = runTest {
-        val res = MockResponse()
-        res.setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST)
-        mockWebServer.enqueue(res)
+    fun testGetProductsAndReturn400() {
+        runTest {
+            val res = MockResponse()
+            res.setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST)
+            mockWebServer.enqueue(res)
 
-        val result = storeRepository.getProducts()
-        val status = (result as? Result.Error)?.status
+            val result = storeRepository.getProducts()
+            val status = (result as? Result.Error)?.status
 
-        mockWebServer.takeRequest()
+            mockWebServer.takeRequest()
 
-        Assert.assertTrue(result is Result.Error)
-        Assert.assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, status)
+            Assert.assertTrue(result is Result.Error)
+            Assert.assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, status)
+        }
     }
 
     @Test
-    fun testGetProductDetailAndReturn200() = runTest {
-        val product = generateProducts(1).first()
-        val json = convertToJson(product)
-        val res = MockResponse()
-        res.setBody(json)
-        res.setResponseCode(200)
-        mockWebServer.enqueue(res)
+    fun testGetProductDetailAndReturn200() {
+        runTest {
+            val product = generateProducts(1).first()
+            val json = convertToJson(product)
+            val res = MockResponse()
+            res.setBody(json)
+            res.setResponseCode(200)
+            mockWebServer.enqueue(res)
 
-        val result = storeRepository.getProductById(1)
-        val productResponse = (result as? Result.Success)?.data
+            val result = storeRepository.getProductById(1)
+            val productResponse = (result as? Result.Success)?.data
 
-        mockWebServer.takeRequest()
+            mockWebServer.takeRequest()
 
-        Assert.assertTrue(result is Result.Success)
-        Assert.assertEquals(product.id, productResponse?.id)
-        Assert.assertEquals(product.title, productResponse?.title)
-        Assert.assertEquals(product.description, productResponse?.description)
+            Assert.assertTrue(result is Result.Success)
+            Assert.assertEquals(product.id, productResponse?.id)
+            Assert.assertEquals(product.title, productResponse?.title)
+            Assert.assertEquals(product.description, productResponse?.description)
+        }
     }
 
     @After

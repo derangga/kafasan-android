@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 fun CenterCircularLoading() {
     Box(
         modifier = Modifier.fillMaxWidth().height(60.dp),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()
     }

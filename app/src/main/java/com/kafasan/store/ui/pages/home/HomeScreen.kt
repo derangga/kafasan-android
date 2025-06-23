@@ -52,7 +52,10 @@ import com.kafasan.store.ui.components.ProductItem
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
+fun HomeScreen(
+    navController: NavHostController,
+    viewModel: HomeViewModel,
+) {
     val pagingItems = viewModel.getProducts().collectAsLazyPagingItems()
     val listState = rememberLazyListState()
     val collapsed by remember {
@@ -65,13 +68,13 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
 
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         stickyHeader {
             val animatedHeight by animateDpAsState(
                 targetValue = if (collapsed) 70.dp else 120.dp,
                 animationSpec = tween(durationMillis = 500, easing = LinearOutSlowInEasing),
-                label = "AnimatedHeaderHeight"
+                label = "AnimatedHeaderHeight",
             )
             CollapsibleHeader(
                 height = animatedHeight,
@@ -81,7 +84,7 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                 },
                 onSearchClick = {
                     navController.navigate(Route.SuggestSearch.route)
-                }
+                },
             )
         }
 
@@ -91,10 +94,11 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
 
         items(pagingItems.itemCount) { rowIndex ->
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 for (columnIndex in 0..1) {
                     val itemIndex = rowIndex * 2 + columnIndex
@@ -102,15 +106,16 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                         val product = pagingItems[itemIndex]
                         product?.also { prd ->
                             Card(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(220.dp),
+                                modifier =
+                                    Modifier
+                                        .weight(1f)
+                                        .height(220.dp),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                                 onClick = {
                                     navController.navigate(
-                                        Route.ProductDetail.createRoute(product.id)
+                                        Route.ProductDetail.createRoute(product.id),
                                     )
-                                }
+                                },
                             ) {
                                 ProductItem(prd)
                             }
@@ -129,7 +134,7 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                         Toast.makeText(
                             LocalContext.current,
                             "Failed get product",
-                            Toast.LENGTH_SHORT
+                            Toast.LENGTH_SHORT,
                         ).show()
                     }
                 }
@@ -149,25 +154,26 @@ fun CollapsibleHeader(
     height: Dp,
     collapsed: Boolean,
     onFavoriteClick: () -> Unit,
-    onSearchClick: () -> Unit
+    onSearchClick: () -> Unit,
 ) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(height),
         color = MaterialTheme.colorScheme.primary,
-        shadowElevation = 4.dp
+        shadowElevation = 4.dp,
     ) {
         Box(modifier = Modifier.padding(16.dp)) {
             AnimatedVisibility(
                 visible = !collapsed,
                 enter = fadeIn(),
-                exit = fadeOut()
+                exit = fadeOut(),
             ) {
                 Column {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text("Welcome", color = Color.White, fontSize = 20.sp)
                         FavoriteIcon(onFavoriteClick)
@@ -180,12 +186,13 @@ fun CollapsibleHeader(
             AnimatedVisibility(
                 visible = collapsed,
                 enter = fadeIn(),
-                exit = fadeOut()
+                exit = fadeOut(),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier =
+                        Modifier
+                            .fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     SearchBar(modifier = Modifier.weight(1f), onClick = onSearchClick)
                     Spacer(modifier = Modifier.width(12.dp))
@@ -202,27 +209,31 @@ fun FavoriteIcon(onClick: () -> Unit) {
         imageVector = Icons.Default.Favorite,
         contentDescription = "Favorite",
         tint = Color.White,
-        modifier = Modifier.clickable(onClick = onClick)
+        modifier = Modifier.clickable(onClick = onClick),
     )
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun SearchBar(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(42.dp)
-            .background(MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(30.dp))
-            .padding(horizontal = 16.dp)
-            .clickable(onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(42.dp)
+                .background(MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(30.dp))
+                .padding(horizontal = 16.dp)
+                .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(Icons.Default.Search, contentDescription = null, tint = Color.White)
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = "Search Products or store",
             color = Color.White.copy(alpha = 0.7f),
-            fontSize = 14.sp
+            fontSize = 14.sp,
         )
     }
 }

@@ -8,6 +8,6 @@ import com.kafasan.store.data.ProductEntity
 
 @Database(entities = [ProductEntity::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
-abstract class KafasanDB: RoomDatabase() {
+abstract class KafasanDB : RoomDatabase() {
     abstract fun productDao(): ProductDao
 }

@@ -2,7 +2,6 @@ package com.kafasan.store.ui.pages.favorite
 
 import android.content.Context
 import androidx.compose.material3.Text
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -33,10 +32,9 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(
     application = HiltTestApplication::class,
-    instrumentedPackages = ["androidx.loader.content"]
+    instrumentedPackages = ["androidx.loader.content"],
 )
 class FavoriteScreenTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -51,10 +49,11 @@ class FavoriteScreenTest {
     fun setup() {
         hiltRule.inject()
 
-        coEvery { mockProductRepo.getProducts() } returns listOf(
-            ProductEntity(1, "Product 1", "product-1", 100, "Desc 1", emptyList(), "", ""),
-            ProductEntity(2, "Product 2", "product-2", 150, "Desc 2", emptyList(), "", "")
-        )
+        coEvery { mockProductRepo.getProducts() } returns
+            listOf(
+                ProductEntity(1, "Product 1", "product-1", 100, "Desc 1", emptyList(), "", ""),
+                ProductEntity(2, "Product 2", "product-2", 150, "Desc 2", emptyList(), "", ""),
+            )
 
         viewModel = FavoriteViewModel(mockProductRepo)
     }
@@ -94,21 +93,26 @@ class FavoriteScreenTest {
     @Test
     fun favoriteScreen_navigatesToProductDetailOnCardClick() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val navController = TestNavHostController(context).apply {
-            navigatorProvider.addNavigator(ComposeNavigator())
-            setGraph(createGraph(startDestination = "favorite") {
-                composable("favorite") { }
-                composable("product/{id}") {
-                    Text("Product Detail Screen")
-                }
-            }, startDestinationArgs = null)
-            setCurrentDestination("favorite")
-        }
+        val navController =
+            TestNavHostController(context).apply {
+                navigatorProvider.addNavigator(ComposeNavigator())
+                setGraph(
+                    createGraph(startDestination = "favorite") {
+                        composable("favorite") { }
+                        composable("product/{id}") {
+                            Text("Product Detail Screen")
+                        }
+                    },
+                    startDestinationArgs = null,
+                )
+                setCurrentDestination("favorite")
+            }
 
         // Mock product repo response
-        coEvery { mockProductRepo.getProducts() } returns listOf(
-            ProductEntity(1, "Product 1", "product-1", 100, "Desc 1", emptyList(), "", ""),
-        )
+        coEvery { mockProductRepo.getProducts() } returns
+            listOf(
+                ProductEntity(1, "Product 1", "product-1", 100, "Desc 1", emptyList(), "", ""),
+            )
 
         viewModel = FavoriteViewModel(mockProductRepo)
 

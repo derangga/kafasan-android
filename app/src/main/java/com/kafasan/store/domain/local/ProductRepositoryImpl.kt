@@ -2,7 +2,7 @@ package com.kafasan.store.domain.local
 
 import com.kafasan.store.data.ProductEntity
 
-class ProductRepositoryImpl(private val productDao: ProductDao): ProductRepository {
+class ProductRepositoryImpl(private val productDao: ProductDao) : ProductRepository {
     override suspend fun insert(product: ProductEntity): Long {
         return productDao.insert(product)
     }

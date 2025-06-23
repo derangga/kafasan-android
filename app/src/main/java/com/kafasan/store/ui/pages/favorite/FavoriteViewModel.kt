@@ -12,28 +12,31 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FavoriteViewModel @Inject constructor(
-    private val productRepo: ProductRepository
-): ViewModel() {
-    private val _products = MutableStateFlow<List<Product>>(emptyList())
-    val products: StateFlow<List<Product>> = _products.asStateFlow()
+class FavoriteViewModel
+    @Inject
+    constructor(
+        private val productRepo: ProductRepository,
+    ) : ViewModel() {
+        private val _products = MutableStateFlow<List<Product>>(emptyList())
+        val products: StateFlow<List<Product>> = _products.asStateFlow()
 
-    fun getFavoriteProducts() {
-        viewModelScope.launch {
-            val result = productRepo.getProducts()
-            _products.value = result.map {
-                Product(
-                    id = it.id,
-                    title = it.title,
-                    slug = it.slug,
-                    images = it.images,
-                    price = it.price,
-                    description = it.description,
-                    creationAt = it.creationAt,
-                    category = null,
-                    updatedAt = it.updatedAt
-                )
+        fun getFavoriteProducts() {
+            viewModelScope.launch {
+                val result = productRepo.getProducts()
+                _products.value =
+                    result.map {
+                        Product(
+                            id = it.id,
+                            title = it.title,
+                            slug = it.slug,
+                            images = it.images,
+                            price = it.price,
+                            description = it.description,
+                            creationAt = it.creationAt,
+                            category = null,
+                            updatedAt = it.updatedAt,
+                        )
+                    }
             }
         }
     }
-}

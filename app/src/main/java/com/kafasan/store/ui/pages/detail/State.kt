@@ -5,5 +5,5 @@ import com.kafasan.store.domain.network.ApiLoad
 
 data class State(
     val isFavorite: Boolean = false,
-    val product: ApiLoad<Product> = ApiLoad.Loading
+    val product: ApiLoad<Product> = ApiLoad.Loading,
 )
