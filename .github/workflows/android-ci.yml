@@ -50,34 +50,53 @@ jobs:
       - name: Extract coverage percentage
         id: coverage
         run: |
+          # Install xmllint for proper XML parsing (more reliable than grep)
+          sudo apt-get install -y libxml2-utils
+
           REPORT_FILE="app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
 
+          echo "Checking for report file at $REPORT_FILE"
           if [ ! -f "$REPORT_FILE" ]; then
             echo "::error::JaCoCo report file not found at $REPORT_FILE"
+            ls -la app/build/reports/jacoco/jacocoTestReport/ || true
             exit 1
           fi
 
-          COVERAGE_LINE=$(grep -m 1 'LINE"' "$REPORT_FILE" || echo "")
-          if [ -z "$COVERAGE_LINE" ]; then
-            echo "::error::No LINE coverage data found in report"
-            exit 1
+          echo "Trying xmllint method first..."
+          COVERED=$(xmllint --xpath 'sum(//report/counter[@type="LINE"]/@covered)' "$REPORT_FILE" 2>/dev/null || echo "ERROR")
+          MISSED=$(xmllint --xpath 'sum(//report/counter[@type="LINE"]/@missed)' "$REPORT_FILE" 2>/dev/null || echo "ERROR")
+
+          if [[ "$COVERED" != "ERROR" && "$MISSED" != "ERROR" ]]; then
+            echo "Successfully parsed with xmllint"
+            echo "Covered lines: $COVERED"
+            echo "Missed lines: $MISSED"
+          else
+            echo "Falling back to grep method..."
+            COVERAGE_LINE=$(grep -m 1 'LINE"' "$REPORT_FILE" || echo "")
+            if [ -z "$COVERAGE_LINE" ]; then
+              echo "::error::No LINE coverage data found in report"
+              exit 1
+            fi
+
+            COVERED=$(echo "$COVERAGE_LINE" | grep -o 'covered="[0-9]*"' | cut -d'"' -f2 || echo "0")
+            MISSED=$(echo "$COVERAGE_LINE" | grep -o 'missed="[0-9]*"' | cut -d'"' -f2 || echo "0")
           fi
 
-          MISSED=$(echo "$COVERAGE_LINE" | grep -o 'missed="[0-9]*"' | cut -d'"' -f2)
-          COVERED=$(echo "$COVERAGE_LINE" | grep -o 'covered="[0-9]*"' | cut -d'"' -f2)
+          # Ensure we have numeric values
+          COVERED=${COVERED:-0}
+          MISSED=${MISSED:-0}
 
-          if [ -z "$MISSED" ] || [ -z "$COVERED" ]; then
-            echo "::error::Failed to extract missed/covered values"
-            exit 1
-          fi
+          echo "Final values - Covered: $COVERED, Missed: $MISSED"
 
-          TOTAL=$((MISSED + COVERED))
+          # Calculate total and percentage
+          TOTAL=$((COVERED + MISSED))
           if [ "$TOTAL" -eq 0 ]; then
             echo "::error::No lines found for coverage calculation"
             exit 1
           fi
 
-          COVERAGE_PERCENT=$(awk "BEGIN {printf \"%.2f\", ($COVERED / $TOTAL) * 100}")
+          # Use bc for floating point calculation to avoid awk issues
+          COVERAGE_PERCENT=$(echo "scale=2; $COVERED * 100 / $TOTAL" | bc)
           echo "Current coverage: $COVERAGE_PERCENT%"
           echo "coverage_percentage=$COVERAGE_PERCENT" >> $GITHUB_OUTPUT
 
