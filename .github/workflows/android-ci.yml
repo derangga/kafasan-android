@@ -60,6 +60,7 @@ jobs:
           generate-branches-badge: true
           generate-summary: true
           jacoco-csv-file: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.csv
+          output: coverage-summary.json
 
       - name: Comment on PR with coverage summary
         if: github.event_name == 'pull_request'
