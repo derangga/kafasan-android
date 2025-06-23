@@ -35,6 +35,10 @@ android {
                 "proguard-rules.pro",
             )
         }
+
+        debug {
+            enableUnitTestCoverage = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -71,6 +75,17 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     }
 }
 
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+tasks.withType<Test>().configureEach {
+    extensions.configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
 
@@ -80,10 +95,21 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         csv.required.set(true)
     }
 
-    val fileTree = fileTree("${layout.buildDirectory}/intermediates/javac/debug/classes")
-    val kotlinTree = fileTree("${layout.buildDirectory}/tmp/kotlin-classes/debug")
+    val javaClasses = fileTree("$buildDir/intermediates/javac/debug/classes") {
+        exclude(
+            "**/R.class", "**/R$*.class",
+            "**/BuildConfig.*", "**/Manifest*.*",
+            "**/*Test*.*"
+        )
+    }
+    val kotlinClasses = fileTree("$buildDir/tmp/kotlin-classes/debug") {
+        exclude(
+            "**/R.class", "**/R$*.class",
+            "**/BuildConfig.*", "**/*Test*.*"
+        )
+    }
 
-    classDirectories.setFrom(files(fileTree, kotlinTree))
+    classDirectories.setFrom(files(javaClasses, kotlinClasses))
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
     executionData.setFrom(fileTree(layout.buildDirectory).include("**/*.exec"))
 }
