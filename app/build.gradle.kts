@@ -75,10 +75,6 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     }
 }
 
-jacoco {
-    toolVersion = "0.8.8"
-}
-
 tasks.withType<Test>().configureEach {
     extensions.configure<JacocoTaskExtension> {
         isIncludeNoLocationClasses = true
@@ -95,27 +91,10 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         csv.required.set(true)
     }
 
-    val javaClasses =
-        fileTree("$buildDir/intermediates/javac/debug/classes") {
-            exclude(
-                "**/R.class",
-                "**/R$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*",
-                "**/*Test*.*",
-            )
-        }
-    val kotlinClasses =
-        fileTree("$buildDir/tmp/kotlin-classes/debug") {
-            exclude(
-                "**/R.class",
-                "**/R$*.class",
-                "**/BuildConfig.*",
-                "**/*Test*.*",
-            )
-        }
+    val fileTree = fileTree("$buildDir/intermediates/javac/debug/classes")
+    val kotlinTree = fileTree("$buildDir/tmp/kotlin-classes/debug")
 
-    classDirectories.setFrom(files(javaClasses, kotlinClasses))
+    classDirectories.setFrom(files(fileTree, kotlinTree))
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
     executionData.setFrom(fileTree(layout.buildDirectory).include("**/*.exec"))
 }
