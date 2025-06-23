@@ -50,12 +50,35 @@ jobs:
       - name: Extract coverage percentage
         id: coverage
         run: |
-          # Extract coverage percentage from JaCoCo report
-          COVERAGE=$(grep -oP 'line-rate="\K[0-9.]+' app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml | head -1)
-          COVERAGE_PERCENT=$(awk "BEGIN {printf \"%.2f\", $COVERAGE * 100}")
+          REPORT_FILE="app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+
+          if [ ! -f "$REPORT_FILE" ]; then
+            echo "::error::JaCoCo report file not found at $REPORT_FILE"
+            exit 1
+          fi
+
+          COVERAGE_LINE=$(grep -m 1 'LINE"' "$REPORT_FILE" || echo "")
+          if [ -z "$COVERAGE_LINE" ]; then
+            echo "::error::No LINE coverage data found in report"
+            exit 1
+          fi
+
+          MISSED=$(echo "$COVERAGE_LINE" | grep -o 'missed="[0-9]*"' | cut -d'"' -f2)
+          COVERED=$(echo "$COVERAGE_LINE" | grep -o 'covered="[0-9]*"' | cut -d'"' -f2)
+
+          if [ -z "$MISSED" ] || [ -z "$COVERED" ]; then
+            echo "::error::Failed to extract missed/covered values"
+            exit 1
+          fi
+
+          TOTAL=$((MISSED + COVERED))
+          if [ "$TOTAL" -eq 0 ]; then
+            echo "::error::No lines found for coverage calculation"
+            exit 1
+          fi
+
+          COVERAGE_PERCENT=$(awk "BEGIN {printf \"%.2f\", ($COVERED / $TOTAL) * 100}")
           echo "Current coverage: $COVERAGE_PERCENT%"
-          
-          # Store coverage in GitHub Actions output
           echo "coverage_percentage=$COVERAGE_PERCENT" >> $GITHUB_OUTPUT
 
       - name: Get main branch coverage
